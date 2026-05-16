@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, jsonify
+from flask import Flask, request, redirect, jasonify
 import pymysql
 
 app = Flask(__name__)
@@ -16,20 +16,20 @@ def cadastrarItem():
 
 
 
-    banco = pymysql.connect(host="127.0.0.1", user="root", passwd="ny2005ny", database="database_projeto")
+    banco = pymysql.connect(host="127.0.0.1", user="root", passwd="12345678", database="database_projeto")
     cursor = banco.cursor()
 
 
     sql = "INSERT INTO products (user_id, name, description, price, created_at) VALUES (%s, %s, %s, %s, NOW());"
 
 
-    cursor.execute(sql, (idFkUser, nomeProduto, descProduto, precoProduto, ))
+    cursor.execute(sql, (nomeProduto, idFkUser, descProduto, precoProduto, ))
     banco.commit()
     banco.close()
 
 
     response = {'mensagem' : 'cadastro realizado', 'cod' : 200}
-    return jsonify(response)
+    return jasonify(response)
 
 if __name__ == "__main__":
     app.run(debug=True)
