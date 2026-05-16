@@ -6,78 +6,79 @@ app = Flask(__name__)
 
 carregar_rotas(app)
 
-######################cadastro de itens###################
-@app.route('/cadastrarItem', methods = ['POST'])
-def cadastrarItem():
-     
-     #pegando dados do json
-    dados = request.get_json()
-    idFkUser = (dados['fkUser'])
-    nomeProduto = str(dados['nomeProduto'])
-    descProduto = str (dados['descProd'])
-    precoProduto = (dados['precoProd'])
-
-    #conectando com o bd
+# 1. Função de conexão isolada (Mude a senha aqui se necessário para o seu banco)
 def db():
     return pymysql.connect(
         host='127.0.0.1',
         user='root',         
-        password='12345678',
+        password='ny2005ny',  # Deixei a senha padronizada, ajuste se for '12345678'
         database='database_projeto', 
         cursorclass=pymysql.cursors.DictCursor 
     )
 
+###################### CADASTRO DE ITENS ###################
+@app.route('/cadastrarItem', methods=['POST'])
+def cadastrarItem():
+    dados = request.get_json()
+    idFkUser = dados['fkUser']
+    nomeProduto = str(dados['nomeProduto'])
+    descProduto = str(dados['descProd'])
+    precoProduto = dados['precoProd']
 
-    cursor = bd.cursor()
+    # Conectando usando a função db()
+    conexao = db()
+    cursor = conexao.cursor()
 
-    #fazendo o insert
+    # Fazendo o insert
     sql = "INSERT INTO products (user_id, name, description, price, created_at) VALUES (%s, %s, %s, %s, NOW());"
+    cursor.execute(sql, (idFkUser, nomeProduto, descProduto, precoProduto))
+    
+    conexao.commit()
+    cursor.close()
+    conexao.close()
 
-    #execultaltando o insert
-    cursor.execute(sql, (idFkUser, nomeProduto, descProduto, precoProduto, ))
-    bd.commit()
-    bd.close()
-
-    # status para ver no postman
-    response = {'mensagem' : 'cadastro realizado', 'cod' : 200}
+    response = {'mensagem': 'cadastro realizado', 'cod': 200}
     return jsonify(response)
 
 
 ####################### EDITAR ######################################
-@app.route('/editarItem', methods = ['PUT'])
+@app.route('/editarItem', methods=['PUT'])
 def editaritem():
-    #pegando valores do json
     dados = request.get_json()
     idRecebido = dados['id']
     nomeFunc = dados['nomeProduto']
 
-    bd = pymysql.connect(host="127.0.0.1", user="root", passwd="ny2005ny", database="database_projeto")
-    cursor = bd.cursor()
-    #update no bd
+    conexao = db()
+    cursor = conexao.cursor()
+    
     sql = "UPDATE products set name = %s WHERE id = %s;"
-    cursor.execute(sql, (nomeFunc, idRecebido, ))
-    bd.commit()
-    bd.close()
-    response = {'mensagem' : 'Item atualizado', 'Codigo' : 200}
+    cursor.execute(sql, (nomeFunc, idRecebido))
+    
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+    
+    response = {'mensagem': 'Item atualizado', 'Codigo': 200}
     return jsonify(response)
 
 
-###########remover itens#################################
-@app.route('/excluirItens', methods = ['DELETE'])
+########### REMOVER ITENS #################################
+@app.route('/excluirItens', methods=['DELETE'])
 def excluir():
     dados = request.get_json()
     idRecebido = dados['id']
 
-    bd = pymysql.connect(host = "127.0.0.1", user = "root", passwd = "ny2005ny", database= "database_projeto")
-    cursor = bd.cursor()
+    conexao = db()
+    cursor = conexao.cursor()
 
     sql = "DELETE FROM products WHERE ID = %s;"
-    cursor.execute(sql, (idRecebido, ))
+    cursor.execute(sql, (idRecebido,))
 
-    bd.commit()
-    bd.close()
+    conexao.commit()
+    cursor.close()
+    conexao.close()
 
-    response = {'Resposta' : 'Item deletado', 'cod' : 200}
+    response = {'Resposta': 'Item deletado', 'cod': 200}
     return jsonify(response)
 
 if __name__ == "__main__":
