@@ -35,14 +35,14 @@ def cadastrarItem():
 ####################### EDITAR ######################################
 @app.route('/editarItem', methods = ['PUT'])
 def editaritem():
-
+    #pegando valores do json
     dados = request.get_json()
     idRecebido = dados['id']
     nomeFunc = dados['nomeProduto']
 
     banco = pymysql.connect(host="127.0.0.1", user="root", passwd="ny2005ny", database="database_projeto")
     cursor = banco.cursor()
-
+    #update no banco
     sql = "UPDATE products set name = %s WHERE id = %s;"
     cursor.execute(sql, (nomeFunc, idRecebido, ))
     banco.commit()
@@ -50,6 +50,24 @@ def editaritem():
     response = {'mensagem' : 'Item atualizado', 'Codigo' : 200}
     return jsonify(response)
 
+
+###########remover itens#################################
+@app.route('/excluirItens', methods = ['DELETE'])
+def excluir():
+    dados = request.get_json()
+    idRecebido = dados['id']
+
+    banco = pymysql.connect(host = "127.0.0.1", user = "root", passwd = "ny2005ny", database= "database_projeto")
+    cursor = banco.cursor()
+
+    sql = "DELETE FROM products WHERE ID = %s;"
+    cursor.execute(sql, (idRecebido, ))
+
+    banco.commit()
+    banco.close()
+
+    response = {'Resposta' : 'Item deletado', 'cod' : 200}
+    return jsonify(response)
 
 if __name__ == "__main__":
     app.run(debug=True)
