@@ -1,20 +1,10 @@
 from flask import Flask, request, redirect, jsonify
-import pymysql
+from database import db
 from routes.registro_login import carregar_rotas
 
 app = Flask(__name__)
 
 carregar_rotas(app)
-
-# 1. Função de conexão isolada (Mude a senha aqui se necessário para o seu banco)
-def db():
-    return pymysql.connect(
-        host='127.0.0.1',
-        user='root',         
-        password='ny2005ny',  # Deixei a senha padronizada, ajuste se for '12345678'
-        database='database_projeto', 
-        cursorclass=pymysql.cursors.DictCursor 
-    )
 
 ###################### CADASTRO DE ITENS ###################
 @app.route('/cadastrarItem', methods=['POST'])
